@@ -1,0 +1,28 @@
+version: '3.2'
+
+networks:
+    shared: {}
+
+services:
+    db:
+        image: postgres
+        environment: 
+            POSTGRES_PASSWORD: moloko
+            POSTGRES_USER: moloko
+            POSTGRES_DB: moloko
+            POSTGRES_HOST_AUTH_METHOD: trust
+        networks: ['shared']
+        volumes: 
+            - /tmp/postgres/data:/var/lib/postgresql/data
+    web:
+        depends_on:
+            - db
+        build: .
+        ports:
+            - 8000:8000
+        restart: on-failure
+        networks: ['shared']
+        env_file:
+            - ./env.dev
+        command: sh -c "uvicorn main:app --host 0.0.0.0 --port 8000"
+    
